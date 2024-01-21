@@ -1,12 +1,32 @@
-#root {
-  background: black;
+.App {
+  background: hsl(0, 0%, 15%);
+  bottom: 0;
   color: #d9d9d9;
+  display: grid;
   font-family: sans-serif;
+  grid-template-columns: 1fr 1fr;
+  left: 0;
   margin: 0;
   padding: 0;
   position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
   right: 0;
+  top: 0;
+}
+
+.Column {
+  display: grid;
+  position: relative;
+}
+.Column h2 {
+  left: 24px;
+  margin: 0;
+  position: absolute;
+  top: 24px;
+}
+.Column:first-of-type {
+  border-right: 2px solid hsl(0, 0%, 35%);
+}
+.Column canvas {
+  height: 100%;
+  width: 100%;
 }

@@ -4,10 +4,21 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + React + TS</title>
+    <title>three vs fiber</title>
+    <link rel="stylesheet" href="/src/App.css" />
   </head>
   <body>
-    <div id="root"></div>
+    <main class="App">
+      <section class="Column">
+        <h2>three</h2>
+        <canvas id="three-canvas" />
+      </section>
+      <section class="Column">
+        <h2>fiber</h2>
+        <div id="fiber-root"></div>
+      </section>
+    </main>
+    <script type="module" src="/src/three.ts"></script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
