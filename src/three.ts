@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 
-const canvas = document.getElementById('three-canvas') as HTMLCanvasElement;
+// const canvas = document.getElementById('three-canvas') as HTMLCanvasElement;
+const canvas = null;
 if (!canvas) throw new Error('three-root not found');
 
 const width = canvas.clientWidth;
@@ -40,4 +41,4 @@ function animate() {
   renderer.render(scene, camera);
 }
 
-animate();
+// animate();

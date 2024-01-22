@@ -1,19 +1,29 @@
 import { Suspense, useRef } from 'react';
-import { AdditiveBlending, Mesh, TextureLoader } from 'three';
+import { AdditiveBlending, Color, DirectionalLight, Mesh, PerspectiveCamera, ShaderMaterial, TextureLoader, Vector3 } from 'three';
 import { Canvas, useFrame, useLoader } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei';
 import { FresnelMat } from './FresnelMat';
 import { CloudMat } from './CloudMat';
+import { LightsMat } from './LightsMat';
 
 const radius = 1;
 const detail = 12;
+const background = new Color("black");
+const directionalLightPos = new Vector3(1, 1, 1);
 
 function EarthGeometry() {
   return <icosahedronGeometry args={[radius, detail]} />;
 }
 
-function Earth() {
-  const [map, bumpMap, specularMap, lightsMap, cloudMap, cloudMapAlpha] = useLoader(
+function Earth({ camera, light }: { camera: PerspectiveCamera; light: DirectionalLight | null }) {
+  const [
+    map,
+    bumpMap,
+    specularMap,
+    lightsMap,
+    cloudMap,
+    cloudMapAlpha
+  ] = useLoader(
     TextureLoader,
     [
       "src/textures/8k_earth_daymap.jpg",
@@ -27,6 +37,8 @@ function Earth() {
 
   const earthMeshRef = useRef<Mesh>(null);
   const lightsMeshRef = useRef<Mesh>(null);
+  const lightsMeshRef2 = useRef<Mesh>(null);
+  const lightsMatRef = useRef<ShaderMaterial>(null);
   const cloudsMeshRef = useRef<Mesh>(null);
   const cloudsMeshRef2 = useRef<Mesh>(null);
   const glowMeshRef = useRef<Mesh>(null);
@@ -36,17 +48,24 @@ function Earth() {
     earthMeshRef.current.rotation.y += 0.1 * delta;
     if (!lightsMeshRef.current) return;
     lightsMeshRef.current.rotation.y += 0.1 * delta;
+    if (!lightsMeshRef2.current) return;
+    lightsMeshRef2.current.rotation.y += 0.1 * delta;
     if (!cloudsMeshRef.current) return;
     cloudsMeshRef.current.rotation.y += 0.12 * delta;
     if (!cloudsMeshRef2.current) return;
     cloudsMeshRef2.current.rotation.y += 0.12 * delta;
     if (!glowMeshRef.current) return;
     glowMeshRef.current.rotation.y += 0.1 * delta; 
+    if (!lightsMatRef.current || !light) return;
+    lightsMatRef.current.uniforms.lightDirection.value =
+      light.position.normalize();
+    lightsMatRef.current.uniforms.cameraPos.value =
+      camera.position.normalize();
   });
 
   return (
     <group rotation={[0, 0, -23.4 * Math.PI / 180]}>
-      <mesh ref={earthMeshRef}>
+      <mesh ref={earthMeshRef} visible={false}>
         <EarthGeometry />
         <meshPhongMaterial
           bumpMap={bumpMap}
@@ -56,11 +75,20 @@ function Earth() {
         />
       </mesh>
 
-      <mesh ref={lightsMeshRef}>
+      <mesh ref={lightsMeshRef} visible={false}>
         <EarthGeometry />
         <meshBasicMaterial
           blending={AdditiveBlending}
           map={lightsMap}
+        />
+      </mesh>
+
+      <mesh ref={lightsMeshRef2}>
+        <EarthGeometry />
+        <LightsMat 
+          earthTexture={map}
+          cityLightsTexture={lightsMap}
+          ref={lightsMatRef}
         />
       </mesh>
 
@@ -69,7 +97,7 @@ function Earth() {
         <CloudMat alphaMap={cloudMapAlpha} />
       </mesh>
 
-      <mesh scale={1.003} ref={cloudsMeshRef2}>
+      <mesh scale={1.003} ref={cloudsMeshRef2} visible={false}>
         <EarthGeometry />
         <meshStandardMaterial
           alphaMap={cloudMapAlpha}
@@ -79,7 +107,7 @@ function Earth() {
         />
       </mesh>
 
-      <mesh scale={1.01} ref={glowMeshRef}>
+      <mesh scale={1.01} ref={glowMeshRef} visible={false}>
         <EarthGeometry />
         <FresnelMat />
       </mesh>
@@ -89,18 +117,26 @@ function Earth() {
   )
 }
 
-function Sun() {
-  return (
-    <directionalLight color="white" intensity={2} position={[1, 1, 1]} />
-  )
-}
+const camera = new PerspectiveCamera(75, 0, 0.1, 1000);
+camera.position.z = 2;
+camera.lookAt(0, 0, 0);
 
 export function FiberEarth() {
+  const lightRef = useRef<DirectionalLight>(null);
+
   return (
     <Suspense fallback={<h2>loading...</h2>}>
-      <Canvas camera={{ position: [0, 0, 2] }}>
-        <Earth />
-        <Sun />
+      <Canvas
+        camera={camera}
+        scene={{ background }}
+      >
+        <Earth camera={camera} light={lightRef.current}/>
+        <directionalLight
+          color="white"
+          intensity={2}
+          position={directionalLightPos}
+          ref={lightRef}
+        />
         <OrbitControls />
       </Canvas>
     </Suspense>
