@@ -9,7 +9,7 @@ import { LightsMat } from './LightsMat';
 const radius = 1;
 const detail = 12;
 const background = new Color("black");
-const directionalLightPos = new Vector3(1, 1, 1);
+const directionalLightPos = new Vector3(1, 0, 0);
 
 function EarthGeometry() {
   return <icosahedronGeometry args={[radius, detail]} />;
@@ -63,9 +63,11 @@ function Earth({ camera, light }: { camera: PerspectiveCamera; light: Directiona
       camera.position.normalize();
   });
 
+    // Adjust for axial tilt
+    // <group rotation={[0, 0, -23.4 * Math.PI / 180]}>
   return (
-    <group rotation={[0, 0, -23.4 * Math.PI / 180]}>
-      <mesh ref={earthMeshRef} visible={false}>
+    <group>
+      <mesh ref={earthMeshRef} visible={true}>
         <EarthGeometry />
         <meshPhongMaterial
           bumpMap={bumpMap}
@@ -83,7 +85,7 @@ function Earth({ camera, light }: { camera: PerspectiveCamera; light: Directiona
         />
       </mesh>
 
-      <mesh ref={lightsMeshRef2}>
+      <mesh ref={lightsMeshRef2} visible={true}>
         <EarthGeometry />
         <LightsMat 
           earthTexture={map}
@@ -138,6 +140,7 @@ export function FiberEarth() {
           ref={lightRef}
         />
         <OrbitControls />
+        <axesHelper args={[3]} />
       </Canvas>
     </Suspense>
   )
