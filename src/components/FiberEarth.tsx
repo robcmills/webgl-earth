@@ -10,6 +10,7 @@ const radius = 1;
 const detail = 12;
 const background = new Color("black");
 const directionalLightPos = new Vector3(1, 0, 0);
+const rotationSpeed = 0.05;
 
 function EarthGeometry() {
   return <icosahedronGeometry args={[radius, detail]} />;
@@ -45,17 +46,17 @@ function Earth({ camera, light }: { camera: PerspectiveCamera; light: Directiona
 
   useFrame((_state, delta) => {
     if (!earthMeshRef.current) return;
-    earthMeshRef.current.rotation.y += 0.1 * delta;
+    earthMeshRef.current.rotation.y += rotationSpeed * delta;
     if (!lightsMeshRef.current) return;
-    lightsMeshRef.current.rotation.y += 0.1 * delta;
+    lightsMeshRef.current.rotation.y += rotationSpeed * delta;
     if (!lightsMeshRef2.current) return;
-    lightsMeshRef2.current.rotation.y += 0.1 * delta;
+    lightsMeshRef2.current.rotation.y += rotationSpeed * delta;
     if (!cloudsMeshRef.current) return;
-    cloudsMeshRef.current.rotation.y += 0.12 * delta;
+    cloudsMeshRef.current.rotation.y += (rotationSpeed + 0.001) * delta;
     if (!cloudsMeshRef2.current) return;
-    cloudsMeshRef2.current.rotation.y += 0.12 * delta;
+    cloudsMeshRef2.current.rotation.y += (rotationSpeed + 0.001) * delta;
     if (!glowMeshRef.current) return;
-    glowMeshRef.current.rotation.y += 0.1 * delta; 
+    glowMeshRef.current.rotation.y += rotationSpeed * delta;
     if (!lightsMatRef.current || !light) return;
     lightsMatRef.current.uniforms.lightDirection.value =
       light.position.normalize();
@@ -99,7 +100,7 @@ function Earth({ camera, light }: { camera: PerspectiveCamera; light: Directiona
         <CloudMat alphaMap={cloudMapAlpha} />
       </mesh>
 
-      <mesh scale={1.003} ref={cloudsMeshRef2} visible={false}>
+      <mesh scale={1.003} ref={cloudsMeshRef2} visible={true}>
         <EarthGeometry />
         <meshStandardMaterial
           alphaMap={cloudMapAlpha}
