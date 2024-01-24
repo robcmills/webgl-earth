@@ -31,14 +31,14 @@ varying vec3 vViewPosition;
 void main() {
   vec3 viewLightDirection = normalize((viewMatrix * vec4(lightDirection, 0.0)).xyz); // Transform light direction to view space
   float lightIntensity = dot(normalize(vNormal), -viewLightDirection);
-  vec4 earthColor = texture2D(earthTexture, vUv);
   vec4 cityLightsColor = texture2D(cityLightsTexture, vUv);
-  if (lightIntensity > 0.0) {
-    gl_FragColor = cityLightsColor;
-  } else {
-      // gl_FragColor = mix(earthColor, cityLightsColor, -lightIntensity); // Blend with city lights
-    gl_FragColor = vec4(0.); // Earth texture in daylight
-  }
+
+  float edge0 = 0.0; // Start of the transition (fully night)
+  float edge1 = 0.25; // End of the transition (fully day)
+
+  float transition = smoothstep(edge0, edge1, -lightIntensity);
+  gl_FragColor = mix(cityLightsColor, vec4(0.), transition);
+
 }`;
 
 export const LightsMat = forwardRef(({
