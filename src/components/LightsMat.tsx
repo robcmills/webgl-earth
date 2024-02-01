@@ -34,7 +34,7 @@ void main() {
   vec4 cityLightsColor = texture2D(cityLightsTexture, vUv);
 
   float edge0 = 0.0; // Start of the transition (fully night)
-  float edge1 = 0.25; // End of the transition (fully day)
+  float edge1 = 0.15; // End of the transition (fully day)
 
   float transition = smoothstep(edge0, edge1, -lightIntensity);
   gl_FragColor = mix(cityLightsColor, vec4(0.), transition);

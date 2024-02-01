@@ -97,7 +97,7 @@ function Earth({ camera, light }: { camera: PerspectiveCamera; light: Directiona
 
       <mesh scale={1.003} ref={cloudsMeshRef} visible={false}>
         <EarthGeometry />
-        <CloudMat alphaMap={cloudMapAlpha} />
+        <CloudMat map={cloudMap} />
       </mesh>
 
       <mesh scale={1.003} ref={cloudsMeshRef2} visible={true}>

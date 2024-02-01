@@ -10,12 +10,12 @@ void main() {
 `;
 
 const fs = `
-uniform sampler2D alphaMap;
+uniform sampler2D map;
 uniform float brightness;
 varying vec2 vUv;
 
 void main() {
-  vec4 texel = texture2D(alphaMap, vUv);
+  vec4 texel = texture2D(map, vUv);
 
   // Convert the texel color to grayscale using the luminosity method
   float grayscale = dot(texel.rgb, vec3(0.299, 0.587, 0.114));
@@ -26,10 +26,10 @@ void main() {
   gl_FragColor = vec4(1.0, 1.0, 1.0, alpha); }
 `;
 
-export function CloudMat({ alphaMap }: { alphaMap: Texture }) {
+export function CloudMat({ map }: { map: Texture }) {
   const onBeforeCompile = function(shader: WebGLProgramParametersWithUniforms) {
     // Add custom uniforms
-    shader.uniforms.alphaMap = { value: alphaMap };
+    shader.uniforms.map = { value: map };
     shader.uniforms.brightness = { value: 2 };
 
     shader.vertexShader = `#define USE_UV\n` + shader.vertexShader;
@@ -37,7 +37,7 @@ export function CloudMat({ alphaMap }: { alphaMap: Texture }) {
     // Add uniform declarations to the fragment shader
     shader.fragmentShader = `
       #define USE_UV
-      uniform sampler2D alphaMap;
+      uniform sampler2D map;
       uniform float brightness;
     ` + shader.fragmentShader;
 
@@ -46,7 +46,7 @@ export function CloudMat({ alphaMap }: { alphaMap: Texture }) {
     shader.fragmentShader = shader.fragmentShader.replace(
       `#include <dithering_fragment>`,
       `
-      vec4 texel = texture2D(alphaMap, vUv);
+      vec4 texel = texture2D(map, vUv);
       float grayscale = dot(texel.rgb, vec3(0.299, 0.587, 0.114));
       float alpha = grayscale * brightness;
       diffuseColor.a = alpha;
